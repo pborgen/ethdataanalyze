@@ -1,282 +1,49 @@
-mas_home: d:/ee
+
 filewatcher_sleep_time: 15
-data_export_base_dir: G:/data_crunch_storage/temp_storage
+data_export_base_dir: /home/paul/dev/eth_data_analyze_home_dir/temp_storage
 storage_type: filesystem
 log_level: DEBUG
 cron_seconds_to_sleep: 15
 include_hash_file: true
-dir_webgui_xml: d:/dev
 
 max_workers: 5
 dask:
   scheduler_url: 127.0.0.1:8786
   n_workers: 3
   threads_per_worker: 1
-  memory_limit: 40GB
+  memory_limit: 20GB
   engine: 'pyarrow'
   compression: 'snappy'
   group_divisions_by: 200
+  temp_directory: /home/paul/dev/eth_data_analyze_home_dir/dask/temp
 
-debug:
-  stop_processing_at_device_irn_equal_to: -1
-  only_analyze_devices_in_range:
-    start_device_irn: -1
-    end_device_irn: -1
-
-on_prem:
+data_organizer:
   enabled: true
-  csv_export_location: d:/2/factsbi
-  backup_incrementatal:
-    enabled: false
-    data_backup_dir: g:/data_crunch_storage/backup
-  drill_common_folder: g:/data_crunch_storage/drill
-  dask_temp_directory: g:/data_crunch_storage/dask_temp
-
-azure:
-  enabled: false
-  storage_account_name: bistore2
-  container_name: raw
-  key: 0
+  csv_export_location: /mnt/crypto/export
 
 data_elements:
   list:
-  - element_name: alphameter
+  - element_name: blocknumber_to_transactions
     type: file
-    file_pattern: '*alphameter.csv'
-    data_export_relative_directory: alphameter
-    allways_get_all_rows: true
-    order_by: alphameter.irn
+    file_pattern: 'block_number_with_transactions_file*'
+    data_export_relative_directory: blocknumber_to_transactions
     columns:
-    - name: IRN
+    - name: block_number
       type: uint32
-    - name: NAME
-    - name: SERIALNO
-    - name: METERSTYLE_IRN
-      type: uint32
-    - name: PHONE
-    - name: INSTALL_DATE
-      is_date: true
-    - name: REMOVAL_DATE
-      is_date: true
-    - name: ROUTE_ID
-    - name: LATITUDE
-    - name: LONGITUDE
-  - element_name: alarms
-    type: file
-    file_pattern: '*auto_gen_alarms.csv'
-    data_export_relative_directory: alarms
-    allways_get_all_rows: true
-    order_by: seqnum
-    columns:
-      - name: SEQNUM
-        type: uint64
-      - name: ELEMENT_IRN
-        type: uint32
-      - name: NAME
-      - name: ACCOUNT_ID
-      - name: ACCOUNT_NAME
-      - name: SERIALNO
-      - name: INSTALL_DATE
-        is_date: true
-      - name: REMOVAL_DATE
-        is_date: true
-      - name: ISCOLLECTOR
-      - name: IS_DISCONNECTABLE
-      - name: TYPE
-      - name: METERSTYLE_IRN
-        type: uint32
-      - name: METER_TYPE
-      - name: EVENT_ID
-      - name: EVENT_NAME
-      - name: EVENT_CATEGORY
-      - name: VALUE
-      - name: DETECTIONTIME
-      - name: STARTTIME
-      - name: ENDTIME
-      - name: ACKNOWLEDGED
-      - name: ACKNOWLEDGED_DATE
-      - name: ACKNOWLEDGED_USER
-      - name: EVENTINFORMATION
-      - name: SEVERITY_CODE
-      - name: SEVERITY
-
-  - element_name: events
-    type: file
-    file_pattern: '*auto_gen_events.csv'
-    data_export_relative_directory: events
-    allways_get_all_rows: true
-    order_by: seqnum
-    columns:
-      - name: SEQNUM
-      - name: ELEMENT_IRN
-      - name: NAME
-      - name: ACCOUNT_ID
-      - name: ACCOUNT_NAME
-      - name: SERIALNO
-      - name: INSTALL_DATE
-        is_date: true
-      - name: REMOVAL_DATE
-        is_date: true
-      - name: ISCOLLECTOR
-      - name: IS_DISCONNECTABLE
-      - name: TYPE
-      - name: METERSTYLE_IRN
-      - name: METER_TYPE
-      - name: EVENT_ID
-      - name: EVENT_NAME
-      - name: EVENT_CATEGORY
-      - name: VALUE
-      - name: DETECTIONTIME
-      - name: STARTTIME
-      - name: ENDTIME
-      - name: ACKNOWLEDGED
-      - name: ACKNOWLEDGED_DATE
-      - name: ACKNOWLEDGED_USER
-      - name: EVENTINFORMATION
-      - name: SEVERITY_CODE
-      - name: SEVERITY
-  - element_name: hops
-    type: file
-    file_pattern: '*auto_gen_hops.csv'
-    data_export_relative_directory: hops
-    allways_get_all_rows: true
-    columns:
-      - name: IRN
-        type: uint32
-      - name: LVL
-      - name: REPEATER_NAME
-      - name: NAME
-      - name: LAST_REGISTER_READ
-        is_date: true
-      - name: LAST_INTERVAL_READ
-        is_date: true
-      - name: LAN_PERF_PERCENT
-      - name: NUM_DESCENDANTS
-      - name: LATITUDE
-      - name: LONGITUDE
-      - name: HOP_KM
-      - name: FIRMWARE
-  - element_name: meterstyle
-    type: file
-    file_pattern: '*auto_gen_meterstyle.csv'
-    data_export_relative_directory: meterstyle
-    allways_get_all_rows: true
-    columns:
-      - name: IRN
-        type: uint32
-      - name: NAME
-      - name: UI_NAME
-
-  - element_name: object_numbers
-    type: file
-    file_pattern: '*object_numbers.csv'
-    data_export_relative_directory: object_numbers
-    csv_separator: '|' # If we do not always get all the rows every time we need more metadata. This will be used to construct the sql query
-    allways_get_all_rows: true
-    columns:
-    - name: OBJECT_NUMBER
-      type: uint32
-    - name: PERIOD
-    - name: PERIOD_TEXT
-    - name: TYPE
-    - name: TYPE_TEXT
-    - name: SUBTYPE
-    - name: SUBTYPE_TEXT
-    - name: TIER
-    - name: TIER_TEXT
-    - name: UOM_CODE
-    - name: UOM_TEXT
-    - name: DIRECTION_TEXT
-    - name: QUADRANT_TEXT
-  - element_name: epcm_messages
-    type: file
-    file_pattern: '*epcm_messages.csv'
-    data_export_relative_directory: epcm_messages
-    orderby:
-      - DEVICE_IRN
-      - OBJECT_NUMBER
-      - READ_TIME
-      - DATE_TIME_UTC
-    columns:
-      - name: DATE_TIME_UTC
-        is_date: true
-        timezone:
-          from: UTC
-          to: AST
-      - name: READ_TIME
-        is_date: true
-        timezone:
-          from: UTC
-          to: AST
-      - name: DEVICE_IRN
-        type: uint32
-      - name: WAN_ENDPOINT_IRN
-        type: uint32
-      - name: OBJECT_NUMBER
-        type: uint32
-      - name: VALUE
-        type: float64
-      - name: SEQNUM
-        type: uint64
-  - element_name: epcm_messages_incremental
-    type: dir
-    file_pattern: 'epcm_messages_incremental_*.csv'
-    data_export_relative_directory: epcm_messages_incremental
-    date_format: '%m/%d/%Y %H:%M:%S'
-    orderby:
-      - DEVICE_IRN
-      - OBJECT_NUMBER
-      - READ_TIME
-      - DATE_TIME_UTC
-    allways_get_all_rows: true
-    columns:
-      - name: DATE_TIME_UTC
-        is_date: true
-      - name: READ_TIME
-        is_date: true
-      - name: DEVICE_IRN
-        type: uint32
-      - name: WAN_ENDPOINT_IRN
-        type: uint32
-      - name: OBJECT_NUMBER
-        type: uint32
-      - name: VALUE
-        type: float64
-      - name: SEQNUM
-        type: uint64
-  - element_name: consumption_out_of_order_logger
-    description: 'Log when consumption reads come in out of order'
-    type: parquet
-    data_export_relative_directory: consumption_logger
-    columns:
-      - name: CURRENT_CONSUMPTION_SEQNUM
-      - name: PREVIOUS_CONSUMPTION_SEQNUM
-
+    - name: transaction_number
 
 data_elements_to_extract:
   enabled: false
   list:
-    - element_name_to_extract: alphameter
-      enabled: true
-    - element_name_to_extract: object_numbers
-      enabled: true
-    - element_name_to_extract: epcm_messages_incremental
-      enabled: true
-    - element_name_to_extract: alarms
-      enabled: false
-    - element_name_to_extract: events
-      enabled: false
-    - element_name_to_extract: hops
-      enabled: false
-    - element_name_to_extract: meterstyle
+    - element_name_to_extract: blocknumber_to_transactions
       enabled: true
 
 data_elements_to_append:
   enabled: true
   list:
-  - element_name: epcm_messages_incremental_file_append
-    element_name_to_append: epcm_messages_incremental
-    data_export_relative_directory: epcm_messages_incremental_file_append
+  - element_name: blocknumber_to_transactions_append
+    element_name_to_append: blocknumber_to_transactions
+    data_export_relative_directory: blocknumber_to_transactions_append
     enabled: true
 
 pre_processing_long_term_data_storage:
@@ -414,7 +181,7 @@ pre_processing_long_term_data_storage:
       enabled: true
 
 data_elements_to_analyze:
-  enabled: true
+  enabled: false
   list:
   - enabled: true
     element_name: analyze_epcm_messages_aggregations
@@ -522,64 +289,11 @@ post_processing_long_term_data_storage:
       npartitions: 5000
 
 data_elements_to_copy:
-  enabled: true
+  enabled: false
   list:
     - name: copy_alphameter
       data_element_name_to_copy: alphameter
       name_of_onprem_parameter_with_directory_location: drill_common_folder
       enabled: false
-    - name: copy_object_numbers
-      data_element_name_to_copy: object_numbers
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_alarms
-      data_element_name_to_copy: alarms
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_events
-      data_element_name_to_copy: events
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_hops
-      data_element_name_to_copy: hops
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_meterstyle
-      data_element_name_to_copy: meterstyle
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_consumption_long_term_storage_partitioned_by_device_irn
-      data_element_name_to_copy: consumption_long_term_storage_partitioned_by_device_irn
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_long_term_storage_consumption_stitched
-      data_element_name_to_copy: long_term_storage_consumption_stitched
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_long_term_storage_consumption_as_interval
-      data_element_name_to_copy: long_term_storage_consumption_as_interval
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_analyze_epcm_messages_aggregations
-      data_element_name_to_copy: analyze_epcm_messages_aggregations
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_long_term_storage_interval_data
-      data_element_name_to_copy: long_term_storage_interval_data
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
-    - name: copy_voltage_long_term_storage_partitioned_by_device_irn
-      data_element_name_to_copy: voltage_long_term_storage_partitioned_by_device_irn
-      name_of_onprem_parameter_with_directory_location: drill_common_folder
-      enabled: true
 
 
-
-db:
-  fetchsize: 10000
-  commuser_info:
-    url: connexo112fresh.eastus2.cloudapp.azure.com
-    port: '1521'
-    sid: amr
-    user:
-    password:

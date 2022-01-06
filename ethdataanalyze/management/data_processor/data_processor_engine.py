@@ -46,11 +46,11 @@ class DataProcessorEngine:
 
     def process(self):
 
-        if self.__settings.get_on_prem_configuration()['enabled']:
-            self.__logger.info(f'Running on-prem data organizer')
+        if self.__settings.run_data_extraction_process():
+            self.__logger.info(f'Starting the data organizer process')
             self.__on_prem_data_organizer.process()
         else:
-            self.__logger.info(f'Skipping the on-prem data organizer')
+            self.__logger.info(f'Skipping the data organizer process')
 
         if self.__settings.run_data_extraction_process():
             self.__logger.info(f'Starting the data export process')

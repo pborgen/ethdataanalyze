@@ -37,7 +37,7 @@ class OnPremDataOrganizer:
         flow = [
             DeleteOrganizeDirectory(),
             CopyFiles(),
-            BackupIncrementalFiles(),
+            #BackupIncrementalFiles(),
             Organize()
         ]
 
@@ -82,8 +82,8 @@ class CopyFiles(DataOrganizerInterface):
         super().__init__()
 
     def process(self):
-        on_prem_config = self.settings.get_on_prem_configuration()
-        csv_export_location = on_prem_config['csv_export_location']
+        data_organizer_config = self.settings.data_organizer()
+        csv_export_location = data_organizer_config['csv_export_location']
 
         # get files to copy
         files = \
@@ -182,6 +182,8 @@ class Organize(DataOrganizerInterface):
 
             # get the files we need to organize
             files_matching_pattern = glob.glob(f'{organize_processing_dir}/{file_pattern}')
+
+            self.__logger.info(f'About to organize files in here {organize_processing_dir}')
 
             for matched_file_full_path in files_matching_pattern:
                 file_name = os.path.basename(matched_file_full_path)

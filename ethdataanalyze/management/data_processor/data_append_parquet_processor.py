@@ -18,7 +18,6 @@ class DataAppendParquetProcessor:
     def __init__(self):
         self.__logger = logging.getLogger(__class__.__name__)
         self.__settings = self.__settings = SettingsFactory.get()
-        self.__pandas_helper = PandasHelper()
         self.__data_processor_helper = DataProcessorHelper()
         self.__max_workers = self.__settings.max_workers()
         self.__dask_helper = DaskHelper()
@@ -70,7 +69,7 @@ class DataAppendParquetProcessor:
                             device_df_list.append(PandasHelper().read_parquet(file))
                         )
 
-                        if counter != 0 & (counter % log_every_n == 0):
+                        if counter != 0 and (counter % log_every_n == 0):
                             self.__logger.info(f'Converted {counter} files to dataframes')
 
                         counter = counter + 1
