@@ -1,7 +1,7 @@
 import pathlib
 import logging
 import os
-import shutil
+import pyarrow as pa
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
@@ -36,6 +36,7 @@ class DataAppendParquetProcessor:
 
                 # this data element
                 element_name = data_element['element_name']
+                #index_name = data_element['index']['name']
                 self.__logger.info(f'Processing {element_name}')
 
                 data_export_directory = self.__data_processor_helper.get_base_directory_from_data_element(data_element)
@@ -60,9 +61,10 @@ class DataAppendParquetProcessor:
 
                 # add the base dataframe
                 device_df_list = []
+                ddf = None
 
                 with concurrent.futures.ThreadPoolExecutor(max_workers=self.__max_workers) as executor:
-                    log_every_n = 100
+                    log_every_n = 500
                     counter = 0
                     for file in parquet_files_to_append:
                         executor.submit(
@@ -72,6 +74,47 @@ class DataAppendParquetProcessor:
                         if counter != 0 and (counter % log_every_n == 0):
                             self.__logger.info(f'Converted {counter} files to dataframes')
 
+                            self.__logger.info(f'About to append dataframes (This can be a long running task)')
+
+                            # trying to not have the memory expand too much with all these dataframes
+                            # in this list in memory
+                            temp_df = pd.concat(device_df_list, axis=0)
+
+                            # clear our the list because it is in temp_df now
+                            device_df_list = []
+
+                            ddf_new_data = dd.from_pandas(temp_df, chunksize=1000000, sort=True)
+
+                            # is this the first time we are wrting to this directory
+                            schema = \
+                                pa.schema([('block_number', pa.int32()), ('transaction_number', pa.string())])
+
+
+                            if not os.listdir(data_element_processing_directory) :
+
+                                os.makedirs(data_element_processing_directory, exist_ok=True)
+
+                                self.__dask_helper.to_parquet(
+                                    ddf_new_data,
+                                    f'{data_element_processing_directory}',
+                                    False, 
+                                    schema
+                                )
+                            else:
+                                ddf_long_term_storage = \
+                                    self.__dask_helper.read_parquet(
+                                        path=data_element_processing_directory
+                                    )
+
+                                ddf = dd.concat([ddf_long_term_storage, ddf_new_data], axis=0)
+
+                                self.__dask_helper.to_parquet(
+                                    ddf,
+                                    f'{data_element_processing_directory}',
+                                    False,
+                                    schema
+                                )
+
                         counter = counter + 1
 
                     self.__logger.info(f'Waiting for threads to stop')
@@ -80,9 +123,14 @@ class DataAppendParquetProcessor:
                 self.__logger.info(f'About to append dataframes (This can be a long running task)')
                 result_df = pd.concat(device_df_list, axis=0)
 
-                os.makedirs(data_element_processing_directory, exist_ok=True)
+                ddf_new_data = dd.from_pandas(result_df, chunksize=1000000, sort=True)
 
-                ddf = dd.from_pandas(result_df, chunksize=1000000, sort=True)
+                ddf_long_term_storage = \
+                    self.__dask_helper.read_parquet(
+                        path=data_element_processing_directory
+                    )
+
+                ddf = dd.concat([ddf_long_term_storage, ddf_new_data], axis=0)
 
                 self.__dask_helper.to_parquet(
                     ddf,
