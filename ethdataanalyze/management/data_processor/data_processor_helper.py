@@ -101,7 +101,7 @@ class DataProcessorHelper:
         """
         clean up epcm_messages_incremental files
         """
-        on_prem_config = self.__settings.get_on_prem_configuration()
+        on_prem_config = self.__settings.get()
         csv_export_location = on_prem_config['csv_export_location']
 
         self.__logger.info(f'Cleaning up incremental files here {csv_export_location}')

@@ -6,6 +6,7 @@ import dask.dataframe as dd
 import dask
 import shutil
 import os
+import time
 from dask.diagnostics import ProgressBar
 from pathlib import Path
 from ethdataanalyze.management.helper.csv_metadata_extractor import CsvMetadataExtractor
@@ -98,6 +99,10 @@ class DaskHelper:
     def set_index(self, ddf, data_element, sorted=False):
         index_name = data_element['index']['name']
 
+        return self.set_index_with_name(ddf, index_name, sorted=False)
+
+    def set_index_with_name(self, ddf, index_name, sorted=False):
+
         if ddf.index.name == index_name:
             ddf = ddf.reset_index(drop=False)
 
@@ -112,31 +117,6 @@ class DaskHelper:
         self.__logger.info(f'End - Setting the index')
 
         return ddf
-
-    def set_index_device_irn(self, ddf, data_element_long_term_storage):
-
-        current_index_name = ddf.index.name
-
-        if current_index_name == 'DEVICE_IRN':
-            # Set the index back
-            ddf = ddf.reset_index()
-
-        drop = True
-
-        # only drop the column if it is not a known column
-        for column in data_element_long_term_storage['columns']:
-            name = column['name']
-            if name == current_index_name:
-                drop = False
-                break
-
-        return \
-            ddf.set_index(
-                'DEVICE_IRN',
-                npartitions=data_element_long_term_storage['npartitions'],
-                sorted=False,
-                drop=drop
-            )
 
     @staticmethod
     def csv_to_dataframe(csv_full_path, dtype=None, date_columns=None, usecols=None, date_parser=None, separator=','):
@@ -236,22 +216,41 @@ class DaskHelper:
             index=index
         )
 
-    def to_parquet(self, ddf, long_term_storage_directory, write_index=True):
+    def to_parquet(self, ddf, long_term_storage_directory, write_index=True, schema=None):
 
         if not os.path.isfile(long_term_storage_directory):
             path = Path(long_term_storage_directory)
             path.mkdir(parents=True, exist_ok=True)
 
         self.__logger.info(f'Start - write to parquet. {long_term_storage_directory}')
+
         ddf.to_parquet(
             long_term_storage_directory,
             write_index=write_index,
             engine=self.__settings.dask_engine(),
             append=False,
             ignore_divisions=True,
-            partition_on=None
+            partition_on=None,
+            schema=schema
         )
         self.__logger.info(f'End - write to parquet. {long_term_storage_directory}')
+
+    @staticmethod
+    def export_to_csv(file_name_base, ddf, data_element, unix_time_stamp=None):
+        
+        if unix_time_stamp is None:
+            unix_time_stamp = int( time.time() )
+
+        data_export_base_directory = \
+            DaskHelper.__get_base_directory_from_data_element(data_element)
+        data_export_processing_directory = f'{data_export_base_directory}/processing'
+
+        generated_file = f'{data_export_processing_directory}/{file_name_base}_{unix_time_stamp}'
+
+        ddf.to_csv(
+            f'{generated_file}.csv',
+            single_file=True
+        )
 
     @staticmethod
     def export_to_file(file_name_base, df, data_element, unix_time_stamp, export_parquet=True, export_csv=True):

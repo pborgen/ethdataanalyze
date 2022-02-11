@@ -5,6 +5,8 @@ from ethdataanalyze.configuration.settings import SettingsFactory
 from ethdataanalyze.management.helper.dask_helper import DaskHelper
 from ethdataanalyze.management.data_processor.data_processor_engine import DataProcessorEngine
 from ethdataanalyze.management.helper.filename_updater import FileNameUpdater
+from ethdataanalyze.management.helper.zip_helper import ZipHelper
+
 class Main:
     def __init__(self):
         propertiesFilePath = '/home/paul/dev/code/ethdataanalyze/ethdataanalyze/configuration'
@@ -18,6 +20,9 @@ class Main:
         self.__logger = logging.getLogger(__class__.__name__)
         self.__logger.info('Logger has been loaded')
 
+    def zipDirectory(self, source);
+        zipHelper = ZipHelper();
+        zipHelper.zip_all_files_in_directory(source, source + '/zip');
 
     def prependToFileNamesInDirectory(self, fullpathDirectory, whatToPrepend):
         fileNameUpdater = FileNameUpdater();

@@ -13,14 +13,14 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/cli.py",
-            "args" : ["--process"]
+            "args" : ["--zip", "/mnt/crypto/export/test/zip"]
         },
         {
             "name": "Python: cli.py - prependToFileName",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/cli.py",
-            "args" : ["--prependToFileName", "/mnt/crypto/export"]
+            "args" : ["--process", "/mnt/crypto/export"]
         },
     ]
 }

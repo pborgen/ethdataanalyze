@@ -46,7 +46,7 @@ class DataProcessorEngine:
 
     def process(self):
 
-        if self.__settings.run_data_extraction_process():
+        if self.__settings.run_data_organizer_process():
             self.__logger.info(f'Starting the data organizer process')
             self.__on_prem_data_organizer.process()
         else:

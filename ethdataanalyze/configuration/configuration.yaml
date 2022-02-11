@@ -18,7 +18,7 @@ dask:
   temp_directory: /home/paul/dev/eth_data_analyze_home_dir/dask/temp
 
 data_organizer:
-  enabled: true
+  enabled: false
   csv_export_location: /mnt/crypto/export
 
 data_elements:
@@ -39,145 +39,29 @@ data_elements_to_extract:
       enabled: true
 
 data_elements_to_append:
-  enabled: true
+  enabled: false
   list:
   - element_name: blocknumber_to_transactions_append
     element_name_to_append: blocknumber_to_transactions
     data_export_relative_directory: blocknumber_to_transactions_append
+    index:
+        name: block_number
+        type: uint32
     enabled: true
 
 pre_processing_long_term_data_storage:
-  enabled: false
+  enabled: true
   list:
-    - element_name: epcm_messages_long_term_storage_partitioned_by_device_irn
-      element_name_to_store: epcm_messages_incremental_file_append
-      data_export_relative_directory: long_term_storage/pre_processing/epcm_messages/partitioned_by_device_irn
+    - element_name: blocknumber_to_transactions_long_term_storage_partitioned_by_block_number
+      element_name_to_store: blocknumber_to_transactions_append
+      data_export_relative_directory: long_term_storage/pre_processing/blocknumber_to_transactions/partitioned_by_block_number
       index:
-        name: DEVICE_IRN
-        type: uint64
+        name: block_number
+        type: uint32
       columns:
-      - name: DATE_TIME_UTC
-        is_date: true
-      - name: READ_TIME
-        is_date: true
-      - name: DEVICE_IRN
-        type: uint32
-      - name: WAN_ENDPOINT_IRN
-        type: uint32
-      - name: OBJECT_NUMBER
-        type: uint32
-      - name: VALUE
-        type: float64
-      - name: SEQNUM
-        type: uint64
-      npartitions: 5000
-      enabled: true
-    - element_name: epcm_messages_long_term_storage_partitioned_by_read_time
-      element_name_to_store: epcm_messages_long_term_storage_partitioned_by_device_irn
-      data_export_relative_directory: long_term_storage/pre_processing/epcm_messages/partitioned_by_read_time
-      index:
-        name: READ_TIME
-        type: datetime64
-      columns:
-        - name: DATE_TIME_UTC
-          is_date: true
-        - name: READ_TIME
-          is_date: true
-        - name: DEVICE_IRN
-          type: uint32
-        - name: WAN_ENDPOINT_IRN
-          type: uint32
-        - name: OBJECT_NUMBER
-          type: uint32
-        - name: VALUE
-          type: float64
-        - name: SEQNUM
-          type: uint64
-      npartitions: 5000
-      enabled: true
-    - element_name: consumption_long_term_storage_partitioned_by_device_irn
-      element_name_to_store: epcm_messages_long_term_storage_partitioned_by_device_irn
-      data_export_relative_directory: long_term_storage/pre_processing/consumption/partitioned_by_device_irn
-      index:
-        name: DEVICE_IRN
-        type: uint64
-      filter: OBJECT_NUMBER==3760195585
-      filter_date_greater_then: 2020-01-01
-      drop_duplicates:
-        subset:
-        - DEVICE_IRN
-        - READ_TIME
-      columns:
-      - name: DATE_TIME_UTC
-        is_date: true
-      - name: READ_TIME
-        is_date: true
-      - name: DEVICE_IRN
-        type: uint32
-      - name: WAN_ENDPOINT_IRN
-        type: uint32
-      - name: OBJECT_NUMBER
-        type: uint32
-      - name: VALUE
-      - name: SEQNUM
-        type: uint64
-      npartitions: 2000
-      enabled: true
-    - element_name: voltage_long_term_storage_partitioned_by_device_irn
-      element_name_to_store: epcm_messages_long_term_storage_partitioned_by_device_irn
-      data_export_relative_directory: long_term_storage/pre_processing/voltage/partitioned_by_device_irn
-      index:
-        name: DEVICE_IRN
-        type: uint64
-      filter: OBJECT_NUMBER==262286
-      filter_date_greater_then: 2020-01-01
-      drop_duplicates:
-        subset:
-          - DEVICE_IRN
-          - READ_TIME
-      columns:
-        - name: DATE_TIME_UTC
-          is_date: true
-        - name: READ_TIME
-          is_date: true
-        - name: DEVICE_IRN
-          type: uint32
-        - name: WAN_ENDPOINT_IRN
-          type: uint32
-        - name: OBJECT_NUMBER
-          type: uint32
-        - name: VALUE
-        - name: SEQNUM
-          type: uint64
-      npartitions: 5000
-      enabled: true
-    - element_name: interval_data_long_term_storage_partitioned_by_device_irn
-      element_name_to_store: epcm_messages_long_term_storage_partitioned_by_device_irn
-      data_export_relative_directory: long_term_storage/pre_processing/intervaldata/partitioned_by_device_irn
-      index:
-        name: DEVICE_IRN
-        type: uint64
-      filter: OBJECT_NUMBER==3760212050
-      filter_date_greater_then: 2020-01-01
-      drop_duplicates:
-        subset:
-        - DEVICE_IRN
-        - READ_TIME
-      columns:
-      - name: DATE_TIME_UTC
-        is_date: true
-      - name: READ_TIME
-        is_date: true
-      - name: DEVICE_IRN
-        type: uint32
-      - name: WAN_ENDPOINT_IRN
-        type: uint32
-      - name: OBJECT_NUMBER
-        type: uint32
-      - name: VALUE
-      - name: SEQNUM
-        type: uint64
-      npartitions: 5000
+      - name: transaction_number
+      npartitions: 1000
+      export_to_csv: true
       enabled: true
 
 data_elements_to_analyze:
@@ -295,5 +179,12 @@ data_elements_to_copy:
       data_element_name_to_copy: alphameter
       name_of_onprem_parameter_with_directory_location: drill_common_folder
       enabled: false
+
+data_elements_to_export_to_csv:
+  enabled: true
+  list:
+    - name: to_csv_blocknumber_to_transactions_long_term_storage_partitioned_by_block_number
+      data_element_name_to_export_to_csv: blocknumber_to_transactions_long_term_storage_partitioned_by_block_number
+      enabled: true
 
 

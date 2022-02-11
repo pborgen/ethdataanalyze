@@ -131,24 +131,30 @@ class PreProcessingLongTermStorageProcessor:
 
                 ddf = ddf.reset_index().drop_duplicates(subset=subset, keep='last')
             else:
-                ddf = ddf.drop_duplicates(keep='last')
+                pass
+                #ddf = ddf.drop_duplicates(keep='last')
 
-            self.__logger.info(f'Filling in empty read_time')
-            # sometimes the READ_TIME is NaN. This happens for Voltage for example
-            ddf = ddf.fillna({'READ_TIME': 0})
-
-            ddf = self.__dask_helper.set_index(ddf, data_element_long_term_storage)
+            if ddf.index.name != index_name:
+                ddf = self.__dask_helper.set_index_with_name(ddf, index_name)
 
             # if we have the default index we do not want to write that
             write_index = False
             if ddf.index.name == index_name:
                 write_index = True
 
-            self.__dask_helper.to_parquet(
-                ddf,
-                long_term_storage_directory,
-                write_index=write_index
-            )
+            # self.__dask_helper.to_parquet(
+            #     ddf,
+            #     long_term_storage_directory,
+            #     write_index=write_index
+            # )
+
+            if data_element_long_term_storage['export_to_csv']:
+                self.__logger.info(f'START -- Write to csv')
+                self.__dask_helper.export_to_csv(
+                    data_element_long_term_storage_name, 
+                    ddf, 
+                    data_element_long_term_storage
+                );
 
         self.__data_processor_helper.cleanup_epcm_messages_incremental()
 

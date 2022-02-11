@@ -7,11 +7,12 @@ if __name__ == '__main__':
 
     print('Arguments passed in: ' + str(sys.argv))
    
+    #parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
     parser = argparse.ArgumentParser()
-    argparser = argparse.ArgumentParser()
     parser.add_argument("--process", action="store_true", help="Run the full process")
     parser.add_argument('--prependToFileName', action='store', type=str, help="Run the prependToFileName process")
-   
+    parser.add_argument("--zip", action="store", type=str, help="Zip All Files")
+
     (args, rest) = parser.parse_known_args()
 
     main = Main();
@@ -22,6 +23,9 @@ if __name__ == '__main__':
     elif args.prependToFileName:
         print('About to run the data process engine')
         main.prependToFileNamesInDirectory(args.prependToFileName, '.csv');
+    elif args.zip:
+        print('About to zip directory = ' + args.zip)
+       # main.zipDirectory(args.zip)
     else: 
         print('The argument specified does not exist')
         sys.exit()
